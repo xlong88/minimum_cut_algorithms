@@ -1,0 +1,138 @@
+This file has some notes on the codes.
+
+INPUT FORMAT
+
+The format is very simple. Lines starting with c are comments. There
+should be one line a the beginning that has "p cut #nodes #arcs" and
+then there should be #arcs lines of the form "a node1 node2 weight",
+which represents an edge between node1 and node2 of weight weight. The
+nodes should be identified by the numbers 1..#nodes.
+
+COMPILATION
+
+The makefile in the src subdirectory builds the 4 programs with
+various options, as well as the generators. The command 'make install'
+will make all the binaries and copy them to the bin subdirectory.
+
+The codes take advantage of features present in gcc, but they should
+compile with any ANSI C compiler. If your system doesn't have getopt.h
+(eg, it is a Sun), you'll need to uncomment -DBROKEN_HDRS on the
+CFLAGS line in the makefile in order to get some of the programs to
+compile.
+
+There also are several compilation flags of interest.
+
+Pick weight data type:
+-DDOUBLEWEIGHTS		double
+-DLONGLONGINTWEIGHTS	long long int (hopefully 64 bit) (gcc only)
+-DINTWEIGHTS		int
+
+General purpose:
+-DSAVECUT		save and print the cut, as well as the value
+-DNO_PR			disable the PR heuristics
+-DVERBOSE               say more. (only some codes support it)
+
+HO specific:
+-DNO_EXCESS_DETECTION   disable the excess detection heuristic
+
+K specific (see karger_mincut.h):
+-DPROBCONST=<value>     tune sampling probability
+-DSAMPLE_2_RESP=<value> tune how many trees get checked
+-DBAILOUTPROB=<value>   tune bailout to gabow's mincut algorithm
+-DPRCONT_MIN=<value>    tune internal PR tests
+
+FILES
+
+main programs:
+  ho.c		  main program for Hao-Orlin
+  k.c		  main program for Karger
+  ks.c	 	  main program for Karger-Stein
+  ni.c		  main program for nagamochi-Ibaraki
+
+interesting shared utilities:
+  graph.[ch]      graph data structures and basic utils shared by HO, K, NI
+  heap.h          priority queue rountines (for K, NI, PR)
+  contract.[ch]   contraction routines
+  pr.[ch]	  Padberg-Rinaldi heuristics
+
+HO stuff:
+  ho.h		  parts of ho needed elsewhere
+  qs.h		  queue and stack macros
+  pr_hoi.[ch]     modified PR tests for use internal to HO
+
+K stuff:
+  karger_mincut.c actual guts of the algorithm
+  gabow_pack.[ch] Gabow's tree packing algorithm
+  allocate.[ch]	  memory goo for gabow_pack
+
+KS stuff:
+  ks.h		  data structures for ks 
+  
+NI stuff:
+  ni_sparse_cert.[ch]  sparse certificate routines (includes MatulaApprox)
+
+boring shared utilities:
+  fprintfll.[ch]  routine to print long long ints
+  random.[ch]	  portable random number generator
+  timer.[ch]	  timing routine
+  memassert.h     an assert that doesn't get turned off by NDEBUG,
+                  used for checking memory allocations
+
+extras:
+  g.c		  Gabow's minimum cut algorithm (small integer weights only)
+  pr_only.c	  PRpreprocess until stuck
+  matula.c        Matula's 2+epsilon approximation alg
+
+generators:
+  bikewheelgen.c  bicycle wheel graphs
+  cyclegen.c	  cycles (boring w/ PR)
+  dblcyclegen.c   two interleaved cycles
+  prgen.c         after Padberg-Rinaldi
+  noigen.c        after Nagamochi-Ono-Ibaraki
+  randomgen.c     almost-regular random graphs
+  regulargen.c    random regular graphs (unions of random cycles or matchings)
+  irregulargen.c  several random matchings + part of another
+  wheelgen.c      wagon wheels (boring w/ PR34)
+
+The dyn_tree subdirectory also contains Dynamic Tree code written by
+Tamas Badics.
+
+NOTES
+
+Getting actual cuts:
+  In most of our testing, we lokoed only at cut values, not the actual
+cuts. Thus my confidence that the codes produce the correct value is
+higher than my condfidence that it produces the right cut. I'm pretty
+sure HO and NI are OK, and K seems to work. I still need to check KS.
+There is a script checkcut.awk, which compare the value to the cut, if
+you want to check. Usage is, eg.
+ho < mygraph | cat - mygraph | checkcut.awk
+Checkcut should report "OK <value> <value>".
+
+Coding style: 
+  HO and NI are similar. K is related, but different. KS is entirely
+different, using conventions known as Hungarian. (See ks.c)
+
+Data structures: 
+  HO, K, NI share data structures and general purpose code. KS uses
+the data structures of the other codes to parse the input and do the
+PR preprocessing. It then switches to entirely different strutures
+that are more convenient for the main algorithm. This makes the main()
+function a little strange. Sorry. Note that ks.c also has some
+obsolete functions, notable pmgReadMetagraph().
+
+Goo: 
+  Work on K is ongoing, so karger_mincut.c has code in it that doesn't
+have any obvious use, because it calls functions that haven't been
+distributed. Please ignore the mess. We note that it probably is not
+useful to test this version of K, because we do still hope to improve
+it. Please contact mslevine@theory.lcs.mit.edu if you want the most
+recent version.
+  We attempted to replicate the PR strategy used by NOI in hybrid, but
+got confused by what seemed to be differences between the paper and
+their code and dropped it. Our code is at the end of ni.c. It should
+be ignored unless you want to get the NOI paper and code and figure
+out what it should be.
+
+$Id: README,v 1.4 1997/06/10 01:17:08 mslevine Exp $
+

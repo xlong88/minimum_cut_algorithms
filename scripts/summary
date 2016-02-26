@@ -1,0 +1,32 @@
+#!/usr/local/bin/perl
+
+
+foreach $file (@ARGV) {
+    @lines = `grep ttime $file`;
+    foreach $line (@lines) {
+	$line =~ s/.*ttime:[ \t]+//;
+	$line =~ s/[ \t].*//;
+	$values{$file} = $values{$file} . " " . $line;
+    }
+}
+ 
+foreach $file (@ARGV) {
+	$nfile = $file;
+    $nfile =~ s#.*/##g;
+    printf "%12s", $nfile;
+}
+print "\n";
+
+foreach $file (@ARGV) {
+    print "  ----------";
+}
+print "\n";
+
+while ($values{$ARGV[0]}) {
+    foreach $file (@ARGV) {
+	break unless $values{$file};
+	($value, $values{$file}) = split(/ /,$values{$file}, 2);
+	printf "%12g", $value;
+    }
+    print "\n";
+}

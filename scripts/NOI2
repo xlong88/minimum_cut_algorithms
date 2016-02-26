@@ -1,0 +1,38 @@
+#!/bin/sh
+
+rcsid='$Id: NOI2,v 1.1 1996/12/10 17:26:46 mslevine Exp $'
+cutdir=${cutdir-..}
+bindir=${cutdir}/bin/
+inputsdir=${cutdir}/inputs/
+resultsdir=${cutdir}/results/
+suffix=`basename $0`
+
+for prog in $*
+do
+rm -f ${resultsdir}${prog}.$suffix
+echo "c" $rcsid > ${resultsdir}${prog}.$suffix
+echo "c run by $USER@`hostname` on `date`"  >> ${resultsdir}${prog}.$suffix
+echo -n "c " >> ${resultsdir}${prog}.$suffix
+ls -l ${bindir}noigen >> ${resultsdir}${prog}.$suffix
+echo -n "c " >> ${resultsdir}${prog}.$suffix
+ls -l ${bindir}${prog} >> ${resultsdir}${prog}.$suffix
+echo " " >> ${resultsdir}${prog}.$suffix
+gs=1
+for n in 300 400 500 600 700 800 900 1000
+do
+  sd=1
+  for seed in `awk "BEGIN {s=31401; for(i=0; i<${cutnumseeds-1};i++) {s+=10; print s}}"`
+  do
+    rn=1
+    for rseed in `awk "BEGIN {s=1401; for(i=0; i<${cutnumrandseeds-1};i++) {s+=10; print s}}"`
+    do
+     echo "c Generator setting: " $gs   "    Seed #:"  $sd  "    Run #:" $rn >> ${resultsdir}${prog}.$suffix
+      echo "${bindir}noigen $n 50 2 $n -s$seed | ${bindir}${prog} -s$rseed >> ${resultsdir}${prog}.$suffix"
+      ${bindir}noigen $n 50 2 $n -s$seed | ${bindir}${prog} -s$rseed >> ${resultsdir}${prog}.$suffix
+      rn=`expr $rn + 1`
+    done
+     sd=`expr $sd + 1`
+  done
+    gs=`expr $gs + 1`
+done
+done

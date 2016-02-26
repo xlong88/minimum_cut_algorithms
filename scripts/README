@@ -1,0 +1,18 @@
+This directory contains various handy scripts.
+
+The scripts with capaitalized names correespond exactly to the problem
+families described in the paper. all runs all of them.
+
+Typical usage is, eg, "TSP ho k ks ni". This will produce ho.TSP,
+k.TSP, ks.TSP, and ni.TSP in the results directory.
+
+Several environment variables can be used to change the behavior:
+cutdir		results are put in ${cutdir}/results
+cutnumseeds	number of different seeds to give to generator
+cutnumrandseeds number of different seeds to give to cut algorithm
+
+summary and capsum are scripts for looking at the output. They take
+multiple results files and make a table of total times or cut
+capacities, respectively.
+
+$Id: README,v 1.1 1997/01/03 22:32:22 mslevine Exp $

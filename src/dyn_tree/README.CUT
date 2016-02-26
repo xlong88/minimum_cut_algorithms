@@ -1,0 +1,22 @@
+This directory contains dynamic tree code written by Tamas Badics.
+The files here are his work, not ours. See the file README in this
+directory for information distributed by him.
+
+It has been modified slightly for use in Karger's algorithm. The only
+changes are in dyn_tree.[ch] and are as follows:
+  1. The necessary data structure was incorporated into ../graph.h, so
+     the declaration here was commented out.
+  2. The memory management was changed. We use ../allocate.[ch] to
+     allocate blocks of memory. This required adding three functions and
+     changing a call to malloc.
+  3. We added dyn_find_min(). It is a slight modification of
+     dyn_find_bottleneck() that is what we need for Karger's algorithm.
+
+All of the changes are clearly marked.
+
+Note that we include all of the files distributed by Tamas Badics,
+regardless of whether we use them. Notably, we do not use this
+makefile. ../makefile builds the objects necessary for use in the
+minimum cut codes.
+
+$Id: README.CUT,v 1.1 1997/06/10 01:16:38 mslevine Exp $

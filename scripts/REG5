@@ -1,0 +1,28 @@
+#!/bin/sh
+
+cutdir=${cutdir-..}
+bindir=${cutdir}/bin/
+inputsdir=${cutdir}/inputs/
+resultsdir=${cutdir}/results/
+suffix=`basename $0`
+
+rm -f ${resultsdir}$1.$suffix
+touch ${resultsdir}$1.$suffix
+gs=1
+for n in 1000 1414 2000 2828 4000 5656 8000
+do
+  sd=1
+  for seed in `awk "BEGIN {s=31401; for(i=0; i<${cutnumseeds-1};i++) {s+=10; print s}}"`
+  do
+    rn=1
+    for rseed in `awk "BEGIN {s=1401; for(i=0; i<${cutnumrandseeds-1};i++) {s+=10; print s}}"`
+    do
+      echo "c Generator setting: " $gs   "    Seed #:"  $sd  "    Run #:" $rn >> ${resultsdir}$1.$suffix
+      echo "${bindir}regulargen $n `awk 'BEGIN {printf("%d",3*log('$n'))}'` -s$seed | ${bindir}$1 -s$rseed >> ${resultsdir}$1.$suffix"
+      ${bindir}regulargen $n `awk 'BEGIN {printf("%d",3*log('$n'))}'` -s$seed | ${bindir}$1 -s$rseed >> ${resultsdir}$1.$suffix
+       rn=`expr $rn + 1`
+    done
+     sd=`expr $sd + 1`
+  done
+    gs=`expr $gs + 1`
+done
